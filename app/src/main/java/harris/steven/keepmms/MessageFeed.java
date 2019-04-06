@@ -20,6 +20,7 @@ public class MessageFeed extends Activity {
     private static final int REQUEST_SEND_SMS = 1;
     private static final int REQUEST_READ_PHONE_STATE = 2;
     private static final int REQUEST_READ_SMS = 3;
+    private static final int REQUEST_RECEIVE_SMS = 4;
 
     //for testing display of messages
     private ArrayList<String> messageListItems = new ArrayList<>();
@@ -39,7 +40,8 @@ public class MessageFeed extends Activity {
                 messageListItems);
         listView.setAdapter(adapter);
 
-        //request SEND_SMS permission
+        //request SEND_SMS permission. Additional permissions are requested when the callback method,
+        //onRequestPermissionsResult, is called.
         requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_SEND_SMS);
 
         //checks and displays permissions granted (for debugging). filter logcat to only show errors to see logs.
@@ -82,13 +84,28 @@ public class MessageFeed extends Activity {
             Log.e("permission", "READ_PHONE_STATE not yet granted");
         }
 
+        if(checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
+            Log.e("permission", "READ_SMS not yet granted");
+        }
+
+        if(checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED){
+            Log.e("permission", "RECEIVE_SMS not yet granted");
+        }
+
         int send_SMS = checkSelfPermission(Manifest.permission.SEND_SMS);
         Log.e("permission","send_sms = " + send_SMS);
 
         int read_phone_state = checkSelfPermission(Manifest.permission.READ_PHONE_STATE);
         Log.e("permission", "read_phone_state = " + read_phone_state);
 
-        if (send_SMS == PackageManager.PERMISSION_GRANTED && read_phone_state == PackageManager.PERMISSION_GRANTED) return true;
+        int read_SMS = checkSelfPermission(Manifest.permission.READ_SMS);
+        Log.e("permission","read_sms = " + read_SMS);
+
+        int receive_SMS = checkSelfPermission(Manifest.permission.RECEIVE_SMS);
+        Log.e("permission", "receive_sms = " + receive_SMS);
+
+        if (send_SMS == PackageManager.PERMISSION_GRANTED && read_phone_state == PackageManager.PERMISSION_GRANTED
+        && read_SMS == PackageManager.PERMISSION_GRANTED && receive_SMS == PackageManager.PERMISSION_GRANTED) return true;
         else return false;
     }
 
@@ -129,12 +146,26 @@ public class MessageFeed extends Activity {
             case REQUEST_READ_SMS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission granted
-                    Log.e("permission", "REQUEST_READ_PHONE_STATE granted");
+                    Log.e("permission", "REQUEST_READ_SMS granted");
+
+                    //after REQUEST_READ_SMS has been granted, request RECEIVE_SMS permission
+                    requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_RECEIVE_SMS);
                 } else {
                     // permission denied
-                    Log.e("permission", "REQUEST_READ_PHONE_STATE denied");
+                    Log.e("permission", "REQUEST_READ_SMS denied");
                 }
                 return;
+            }
+
+            case REQUEST_RECEIVE_SMS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission granted
+                    Log.e("permission", "REQUEST_RECEIVE_SMS granted");
+
+                } else {
+                    // permission denied
+                    Log.e("permission", "REQUEST_RECEIVE_SMS denied");
+                }
             }
         }
     }
