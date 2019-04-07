@@ -4,21 +4,25 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.sql.Timestamp;
 
 public class SmsReceiver extends BroadcastReceiver {
 
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
     private static final String TAG = "SmsReceiver";
     String msg, phoneNo = "";
+    MessageAdapter messageAdapter;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.e(TAG, "intent received: " + intent.getAction());
-
-        if(intent.getAction() == ("android.provider.Telephony.SMS_RECEIVED")){
+//        Log.e(TAG, "intent received: " + intent.getAction());
+         messageAdapter = MessageAdapter.getMessageAdapterInstance(context);
+        if(intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)){
             Bundle bundle = intent.getExtras();
 
             if(bundle != null){
@@ -30,11 +34,13 @@ public class SmsReceiver extends BroadcastReceiver {
                     message[i] = SmsMessage.createFromPdu((byte[])pdu[i], format);
 
                     msg = message[i].getMessageBody();
-                    phoneNo = message[i].getDisplayOriginatingAddress();
-
                 }
-                Toast.makeText(context, "Message: " + msg, Toast.LENGTH_LONG).show();
-                Log.e("SMS Receive", "Message: " + msg);
+                phoneNo = message[0].getOriginatingAddress();
+
+                messageAdapter.add(new Message(phoneNo, msg, new Timestamp(System.currentTimeMillis()), false));
+
+//                Toast.makeText(context, "Message: " + msg + "From:" + phoneNo, Toast.LENGTH_LONG).show();
+//                Log.e("SMS Receive", "Message: " + msg);
 
             }
         }

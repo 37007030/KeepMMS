@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 public class MessageFeed extends Activity {
 
@@ -21,24 +21,13 @@ public class MessageFeed extends Activity {
     private static final int REQUEST_READ_PHONE_STATE = 2;
     private static final int REQUEST_READ_SMS = 3;
     private static final int REQUEST_RECEIVE_SMS = 4;
-
-    //for testing display of messages
-    private ArrayList<String> messageListItems = new ArrayList<>();
-
-
+    private MessageAdapter messageAdapter;
+    private ListView messages_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_feed);
-
-        //for testing display of messages
-        ArrayAdapter<String> adapter;
-        ListView listView = findViewById(R.id.messages_view);
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
-                messageListItems);
-        listView.setAdapter(adapter);
 
         //request SEND_SMS permission. Additional permissions are requested when the callback method,
         //onRequestPermissionsResult, is called.
@@ -46,22 +35,29 @@ public class MessageFeed extends Activity {
 
         //checks and displays permissions granted (for debugging). filter logcat to only show errors to see logs.
         checkPermission();
-
+        messageAdapter = MessageAdapter.getMessageAdapterInstance(this);
         Button sendMessage = findViewById(R.id.send_button);
-
+        messages_view = findViewById(R.id.messages_view);
+        messages_view.setAdapter(messageAdapter);
         sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText editTextMessage = findViewById(R.id.editText);
-                String message = editTextMessage.getText().toString();
+                String messageText = editTextMessage.getText().toString();
+                if (messageText.isEmpty()) {
+                    messageText = "Empty Message";
+                }
+                Message message = new Message(UUID.randomUUID().toString(), messageText, new Timestamp(System.currentTimeMillis()), true);
+
                 EditText editTextToPhoneNumber = findViewById(R.id.editTextToPhoneNumber);
 
                 //Make sure we have all required permissions before attempting to send message. If we do, send the text
                 if (checkPermission()) {
                     Log.e("permission", "Calling SmsManager.getDefault() next");
                     SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(editTextToPhoneNumber.getText().toString(), null, message, null, null);
-
+                    smsManager.sendTextMessage(editTextToPhoneNumber.getText().toString(), null, messageText, null, null);
+                    //clear edit text
+                    editTextMessage.getText().clear();
                     //Show the message in the messages_view activity
                     addToFeed(message);
 
@@ -171,7 +167,7 @@ public class MessageFeed extends Activity {
     }
 
     //displays sent SMS messages in the message feed
-    private void addToFeed(String message){
-        messageListItems.add(message);
+    private void addToFeed(Message message){
+        messageAdapter.add(message);
     }
 }
