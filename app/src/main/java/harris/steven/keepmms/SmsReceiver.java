@@ -37,7 +37,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
                 phoneNo = message[0].getOriginatingAddress();
 
-                messageAdapter.add(new Message(phoneNo, msg, new Timestamp(System.currentTimeMillis()), false));
+                messageAdapter.add(new Message("0", phoneNo, msg, new Timestamp(System.currentTimeMillis())));
 
 //                Toast.makeText(context, "Message: " + msg + "From:" + phoneNo, Toast.LENGTH_LONG).show();
 //                Log.e("SMS Receive", "Message: " + msg);

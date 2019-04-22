@@ -1,20 +1,28 @@
 package harris.steven.keepmms;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends BaseAdapter {
-    public static List<Message> messages = new ArrayList<Message>();
+    public static List<Message> messages;
     Context context;
     private static MessageAdapter instance = null;
+    KeepMMSDatabaseHelper keepmmsDatabaseHelper;
+    SQLiteDatabase db;
 
     public static MessageAdapter getMessageAdapterInstance(Context context) {
         if (instance == null) {
@@ -25,12 +33,27 @@ public class MessageAdapter extends BaseAdapter {
 
     private MessageAdapter(Context context){
         this.context = context;
+        keepmmsDatabaseHelper = new KeepMMSDatabaseHelper(context);
+        db = keepmmsDatabaseHelper.getWritableDatabase();
+        Cursor cursor = db.query("MESSAGE", new String[] {"ID", "TO_ID", "FROM_ID", "MESSAGE", "TIMESTAMP"}, null,null, null, null, "TIMESTAMP ASC");
+        messages = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Message mFromDatabase = new Message(
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    new Timestamp(cursor.getLong(4)
+                    ));
+            messages.add(mFromDatabase);
+            Log.i("database", "Got message from database: " + mFromDatabase.toString());
+        }
     }
 
 
     public void add(Message message) {
         messages.add(message);
         instance.notifyDataSetChanged(); // to render the list we need to notify
+        KeepMMSDatabaseHelper.insertMessage(db, message);
     }
 
     @Override
@@ -57,12 +80,12 @@ public class MessageAdapter extends BaseAdapter {
 
         if (message.isMyMessage()) { // this message was sent by us so let's create a basic chat bubble on the right
             convertView = messageInflater.inflate(R.layout.my_message, null);
-            holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+            holder.messageBody = convertView.findViewById(R.id.message_body);
             convertView.setTag(holder);
             holder.messageBody.setText(message.getMessage());
         } else { // this message was sent by someone else so let's create an advanced chat bubble on the left
             convertView = messageInflater.inflate(R.layout.their_message, null);
-            holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+            holder.messageBody = convertView.findViewById(R.id.message_body);
             convertView.setTag(holder);
             holder.messageBody.setText(message.getMessage());
         }

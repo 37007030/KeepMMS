@@ -44,15 +44,16 @@ public class MessageFeed extends Activity {
             public void onClick(View v) {
                 EditText editTextMessage = findViewById(R.id.editText);
                 String messageText = editTextMessage.getText().toString();
-                if (messageText.isEmpty()) {
-                    messageText = "Empty Message";
-                }
-                Message message = new Message(UUID.randomUUID().toString(), messageText, new Timestamp(System.currentTimeMillis()), true);
-
                 EditText editTextToPhoneNumber = findViewById(R.id.editTextToPhoneNumber);
+                String phoneNumber = editTextToPhoneNumber.getText().toString();
 
+                Message message = new Message(phoneNumber, "0", messageText, new Timestamp(System.currentTimeMillis()));
+
+                if (messageText.isEmpty() || phoneNumber.isEmpty()){
+                    Toast.makeText(MessageFeed.this, "Message or phone number is missing", Toast.LENGTH_SHORT).show();
+                }
                 //Make sure we have all required permissions before attempting to send message. If we do, send the text
-                if (checkPermission()) {
+                else if (checkPermission()) {
                     Log.e("permission", "Calling SmsManager.getDefault() next");
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(editTextToPhoneNumber.getText().toString(), null, messageText, null, null);
