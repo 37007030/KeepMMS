@@ -31,8 +31,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".MessageFeed" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".KeptItems" />
+        <activity android:name=".SettingsActivity"
+            android:label="@string/settings"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".KeptItems"
+            android:label="@string/kept_items"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

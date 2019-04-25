@@ -1,18 +1,15 @@
 package harris.steven.keepmms;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ public class MessageAdapter extends BaseAdapter {
             return instance;
     }
 
-    private MessageAdapter(Context context){
+    private MessageAdapter(Context context) {
         this.context = context;
         keepmmsDatabaseHelper = new KeepMMSDatabaseHelper(context);
         db = keepmmsDatabaseHelper.getWritableDatabase();

@@ -11,9 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.sql.Timestamp;
-import java.util.UUID;
 
 public class MessageFeed extends Activity {
 
@@ -22,6 +20,7 @@ public class MessageFeed extends Activity {
     private static final int REQUEST_READ_SMS = 3;
     private static final int REQUEST_RECEIVE_SMS = 4;
     private MessageAdapter messageAdapter;
+    private LinkChecker linkChecker;
     private ListView messages_view;
 
     @Override
@@ -36,6 +35,10 @@ public class MessageFeed extends Activity {
         //checks and displays permissions granted (for debugging). filter logcat to only show errors to see logs.
         checkPermission();
         messageAdapter = MessageAdapter.getMessageAdapterInstance(this);
+
+        /////
+        linkChecker = LinkChecker.getLinkCheckerInstance(this);
+        /////
         Button sendMessage = findViewById(R.id.send_button);
         messages_view = findViewById(R.id.messages_view);
         messages_view.setAdapter(messageAdapter);
@@ -49,7 +52,7 @@ public class MessageFeed extends Activity {
 
                 Message message = new Message(phoneNumber, "0", messageText, new Timestamp(System.currentTimeMillis()));
 
-                if (messageText.isEmpty() || phoneNumber.isEmpty()){
+                if (messageText.isEmpty() || phoneNumber.isEmpty()) {
                     Toast.makeText(MessageFeed.this, "Message or phone number is missing", Toast.LENGTH_SHORT).show();
                 }
                 //Make sure we have all required permissions before attempting to send message. If we do, send the text
@@ -62,13 +65,16 @@ public class MessageFeed extends Activity {
                     //Show the message in the messages_view activity
                     addToFeed(message);
 
+                    //Check for links sent in message, which should be saved in the Kept Items activity
+                    LinkChecker.checkForLinksInMessage(message);
+                    LinkChecker.getLinks();
+
                 } else {
                     Toast.makeText(MessageFeed.this, "Permission denied", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        }
-   // }
+    }
 
     private boolean checkPermission() {
         Log.e("permission", "Begin checkPermission");
