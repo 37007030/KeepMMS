@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.sql.Timestamp;
 
@@ -37,11 +35,11 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
                 phoneNo = message[0].getOriginatingAddress();
 
-                messageAdapter.add(new Message("0", phoneNo, msg, new Timestamp(System.currentTimeMillis())));
+                Message newMessage = new Message("0", phoneNo, msg, new Timestamp(System.currentTimeMillis()));
+                messageAdapter.add(newMessage);
+                LinkChecker.checkForLinksInMessage(newMessage);
 
 //                Toast.makeText(context, "Message: " + msg + "From:" + phoneNo, Toast.LENGTH_LONG).show();
-//                Log.e("SMS Receive", "Message: " + msg);
-
             }
         }
 
