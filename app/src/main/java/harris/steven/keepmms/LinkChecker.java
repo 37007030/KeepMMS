@@ -3,7 +3,10 @@ package harris.steven.keepmms;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Keep;
 import android.util.Log;
+import android.view.View;
+
 import org.apache.commons.validator.routines.UrlValidator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,11 +18,10 @@ public class LinkChecker {
 
     private static UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_ALL_SCHEMES);
 
-
-    Context context;
+    private Context context;
     private static LinkChecker instance = null;
-    KeepMMSDatabaseHelper keepmmsDatabaseHelper;
-    static SQLiteDatabase db;
+    private KeepMMSDatabaseHelper keepmmsDatabaseHelper;
+    private static SQLiteDatabase db;
 
 
     public static LinkChecker getLinkCheckerInstance(Context context) {
@@ -33,6 +35,7 @@ public class LinkChecker {
         this.context = context;
         keepmmsDatabaseHelper = new KeepMMSDatabaseHelper(context);
         db = keepmmsDatabaseHelper.getWritableDatabase();
+
     }
 
     public static boolean validUrl(String url){

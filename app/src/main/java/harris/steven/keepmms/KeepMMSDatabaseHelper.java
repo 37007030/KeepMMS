@@ -2,6 +2,7 @@ package harris.steven.keepmms;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -12,8 +13,10 @@ import java.util.Set;
 public class KeepMMSDatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "KEEPMMS";
     private static final int DB_VERSION = 1;
+
     private static final String CREATE_TABLE_USER = "CREATE TABLE USER ("
             + "UID TEXT PRIMARY KEY);";
+
     private static final String CREATE_TABLE_MESSAGE = "CREATE TABLE MESSAGE ("
             + "ID INTEGER PRIMARY KEY AUTOINCREMENT, "
             + "TO_ID TEXT, "
@@ -28,14 +31,35 @@ public class KeepMMSDatabaseHelper extends SQLiteOpenHelper {
             "LINK TEXT, " +
             "TIMESTAMP TEXT);";
 
+
+    private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE SETTINGS (" +
+            "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "DISPLAY_SENT_LINKS INTEGER NOT NULL);";
+
+    private static final String INSERT_DEFAULT_SETTINGS = "INSERT INTO SETTINGS " +
+            "VALUES(1, 1);";
+
+    private static KeepMMSDatabaseHelper sInstance;
+
+    public static synchronized KeepMMSDatabaseHelper getInstance(Context context) {
+
+        if (sInstance == null) {
+            sInstance = new KeepMMSDatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
     KeepMMSDatabaseHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_MESSAGE);
         db.execSQL(CREATE_TABLE_LINKS);
+        db.execSQL(CREATE_TABLE_SETTINGS);
+        db.execSQL(INSERT_DEFAULT_SETTINGS);
     }
 
     @Override
@@ -69,6 +93,37 @@ public class KeepMMSDatabaseHelper extends SQLiteOpenHelper {
         printContentValues(linkValues);
 
         db.insert("LINK", null, linkValues);
+    }
+
+    public static void changeSettingSentLinks(SQLiteDatabase db, int value) {
+        db.execSQL("UPDATE SETTINGS SET DISPLAY_SENT_LINKS = " + value);
+    }
+
+    public static int querySettingSentLinks(SQLiteDatabase db) {
+        int settingsValue = -1;
+
+        Cursor cur = db.rawQuery("SELECT DISPLAY_SENT_LINKS FROM SETTINGS", null);
+        if (cur != null) {
+            cur.moveToFirst();
+
+            Log.e("harris", cur.getColumnName(0));
+            Log.e("harris", String.valueOf(cur.getCount()));
+
+            settingsValue = cur.getInt(0);
+
+            if (settingsValue == 0) {
+                Log.e("harris", "DISPLAY_SENT_LINKS value: 0");
+            }
+            else {
+                Log.e("harris", "DISPLAY_SENT_LINKS value: " + settingsValue);
+            }
+            cur.close();
+        }
+
+        else {
+            Log.e("harris", "cursor is null");
+        }
+        return settingsValue;
     }
 
     public static void printContentValues(ContentValues vals)

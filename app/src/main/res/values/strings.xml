@@ -11,4 +11,8 @@
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="signed_out">Signed Out</string>
     <string name="toPhoneNumber">To: </string>
+    <string name="settingsLabelLinks">Links</string>
+    <string name="settingsLabelKeepLinksIsend">Keep links I send</string>
+    <string name="linksIsent">Links I Sent</string>
+    <string name="linksSentToMe">Links Sent To Me</string>
 </resources>
