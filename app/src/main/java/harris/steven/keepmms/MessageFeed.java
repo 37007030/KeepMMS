@@ -33,13 +33,12 @@ public class MessageFeed extends Activity {
         //onRequestPermissionsResult, is called.
         requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_SEND_SMS);
 
-        //checks and displays permissions granted (for debugging). filter logcat to only show errors to see logs.
+        //checks and displays permissions granted (for debugging). filter logcat to only show errors "harris" to see logs.
         checkPermission();
         messageAdapter = MessageAdapter.getMessageAdapterInstance(this);
 
-        /////
         linkChecker = LinkChecker.getLinkCheckerInstance(this);
-        /////
+
         Button sendMessage = findViewById(R.id.send_button);
         messages_view = findViewById(R.id.messages_view);
         messages_view.setAdapter(messageAdapter);
