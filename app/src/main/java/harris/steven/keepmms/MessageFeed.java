@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import java.sql.Timestamp;
 
+
 public class MessageFeed extends Activity {
 
     private static final int REQUEST_SEND_SMS = 1;
@@ -60,6 +61,7 @@ public class MessageFeed extends Activity {
                     Log.e("permission", "Calling SmsManager.getDefault() next");
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(editTextToPhoneNumber.getText().toString(), null, messageText, null, null);
+
                     //clear edit text
                     editTextMessage.getText().clear();
                     //Show the message in the messages_view activity
@@ -177,4 +179,5 @@ public class MessageFeed extends Activity {
     private void addToFeed(Message message){
         messageAdapter.add(message);
     }
+
 }

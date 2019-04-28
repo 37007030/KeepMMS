@@ -3,10 +3,7 @@ package harris.steven.keepmms;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Keep;
 import android.util.Log;
-import android.view.View;
-
 import org.apache.commons.validator.routines.UrlValidator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
