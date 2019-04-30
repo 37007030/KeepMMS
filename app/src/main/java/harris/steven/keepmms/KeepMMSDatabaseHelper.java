@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class KeepMMSDatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "KEEPMMS";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     private static final String CREATE_TABLE_USER = "CREATE TABLE USER ("
             + "UID TEXT PRIMARY KEY);";
@@ -55,6 +55,8 @@ public class KeepMMSDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d("db", "onCreate: db version "+ db.getVersion());
+
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_MESSAGE);
         db.execSQL(CREATE_TABLE_LINKS);
@@ -64,7 +66,12 @@ public class KeepMMSDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        Log.d("db", "onUpgrade: upgraded db from "+ db.getVersion());
+        db.execSQL("DROP TABLE IF EXISTS USER");
+        db.execSQL("DROP TABLE IF EXISTS MESSAGE");
+        db.execSQL("DROP TABLE IF EXISTS LINK");
+        db.execSQL("DROP TABLE IF EXISTS SETTINGS");
+        onCreate(db);
     }
 
     public static void insertUser(SQLiteDatabase db, String UID){
